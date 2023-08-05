@@ -1,27 +1,42 @@
 import requests
 
-nbp_api_url = 'https://api.nbp.pl/api/exchangerates/tables/a?format=json'
-kursy_z_api = requests.get(nbp_api_url)
-kursy_walut = kursy_z_api.json()
-kursy_walut = kursy_walut[0]['rates']
+def get_exchange_rates():
+    nbp_api_url = 'https://api.nbp.pl/api/exchangerates/tables/a?format=json'
+    response = requests.get(nbp_api_url)
+    exchange_rates = response.json()
+    return {rate["code"]: rate['mid'] for rate in exchange_rates[0]['rates']}
 
-for waluta in kursy_walut:
-    if waluta["code"] == 'USD':
-        kursUSD = waluta['mid']
+currency_rates = get_exchange_rates()
 
-    elif waluta["code"] == 'EUR':
-        kursEUR = waluta['mid']
+def get_currency(currency_code):
+    return currency_rates.get(currency_code.upper())
 
-ile = int(input("Ile masz złotówek? "))
-waluta = input("Chcesz wymienić na EUR czy USD? ")
+def get_amount_and_currency():
+    amount = float(input("Ile masz pieniędzy (kwota)? "))
+    currency = input("Podaj kod waluty [EUR, USD, CHF itp.] ").upper()
+    return amount, currency
 
-if waluta.upper() == "USD":
-    converted = round(ile / kursUSD, 2)
-    print(f'Wymienisz na {converted} USD')
+def convert_to_foreign_currency(amount, currency):
+    rate = get_currency(currency)
+    converted = round(amount / rate, 2)
+    print(f"Wymienisz na {converted} {currency}")
 
-elif waluta.upper() == "EUR":
-    converted = round(ile / kursEUR, 2)
-    print(f'Wymienisz na {converted} EUR')
+def convert_to_pln(amount, currency):
+    rate = get_currency(currency)
+    convert_to_pln = round(amount * rate, 2)
+    print(f"Wymienisz na {convert_to_pln} PLN")
 
+def main():
+    ask = input("1. Chcę wymienić złotówki na obcą walutę\n2. Chcę wymienić obcą walutę na złotówki\nWybierz: ")
 
+    if ask == "1":
+        amount, currency = get_amount_and_currency()
+        convert_to_foreign_currency(amount, currency)
+    elif ask == "2":
+        amount, currency = get_amount_and_currency()
+        convert_to_pln(amount, currency)
+    else:
+        print("Wybierz opcję 1 lub 2.")
 
+if __name__ == "__main__":
+    main()
