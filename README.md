@@ -16,3 +16,8 @@ Wykorzystuje oficjalne API Narodowego Banku Polskiego (NBP) do pobierania aktual
   <li>Prosty interfejs umożliwia użytkownikom wybór kwoty i waluty docelowej</li>
 </ul> 
 
+# Wymagania
+<ul>
+  <li>Requests==2.31.0</li>
+</ul>
+
